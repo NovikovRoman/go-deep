@@ -1,10 +1,11 @@
 package training
 
 import (
+	"math"
 	"sync"
 	"time"
 
-	deep "github.com/patrikeh/go-deep"
+	deep "github.com/NovikovRoman/go-deep"
 )
 
 // BatchTrainer implements parallelized batch training
@@ -148,7 +149,11 @@ func (t *BatchTrainer) calculateDeltas(n *deep.Neural, ideal []float64, wid int)
 			for k, s := range n.Out {
 				sum += s.Weight * nextD[k]
 			}
-			iD[j] = n.DActivate(n.Value) * sum
+			if math.IsNaN(n.DActivate(n.Value) * sum) {
+				iD[j] = n.DActivate(n.Value)
+			} else {
+				iD[j] = n.DActivate(n.Value) * sum
+			}
 		}
 	}
 
@@ -176,7 +181,9 @@ func (t *BatchTrainer) update(n *deep.Neural, it int) {
 					jAD[k],
 					it,
 					idx)
-				s.Weight += update
+				if !math.IsNaN(s.Weight + update) {
+					s.Weight += update
+				}
 				jAD[k] = 0
 				idx++
 			}

@@ -1,6 +1,6 @@
-module github.com/patrikeh/go-deep
+module github.com/NovikovRoman/go-deep
 
-go 1.13
+go 1.20
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect

@@ -1,9 +1,10 @@
 package training
 
 import (
+	"math"
 	"time"
 
-	deep "github.com/patrikeh/go-deep"
+	deep "github.com/NovikovRoman/go-deep"
 )
 
 // Trainer is a neural network trainer
@@ -46,8 +47,8 @@ func newTraining(layers []*deep.Layer) *internal {
 func (t *OnlineTrainer) Train(n *deep.Neural, examples, validation Examples, iterations int) {
 	t.internal = newTraining(n.Layers)
 
-	train := make(Examples, len(examples))
-	copy(train, examples)
+	//train := make(Examples, len(examples))
+	//copy(train, examples)
 
 	t.printer.Init(n)
 	t.solver.Init(n.NumWeights())
@@ -84,7 +85,9 @@ func (t *OnlineTrainer) calculateDeltas(n *deep.Neural, ideal []float64) {
 			for k, s := range neuron.Out {
 				sum += s.Weight * t.deltas[i+1][k]
 			}
-			t.deltas[i][j] = neuron.DActivate(neuron.Value) * sum
+			if !math.IsNaN(neuron.DActivate(neuron.Value) * sum) {
+				t.deltas[i][j] = neuron.DActivate(neuron.Value) * sum
+			}
 		}
 	}
 }
@@ -98,7 +101,9 @@ func (t *OnlineTrainer) update(n *deep.Neural, it int) {
 					t.deltas[i][j]*l.Neurons[j].In[k].In,
 					it,
 					idx)
-				l.Neurons[j].In[k].Weight += update
+				if !math.IsNaN(l.Neurons[j].In[k].Weight + update) {
+					l.Neurons[j].In[k].Weight += update
+				}
 				idx++
 			}
 		}

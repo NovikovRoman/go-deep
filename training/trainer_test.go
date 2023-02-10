@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"testing"
 
-	deep "github.com/patrikeh/go-deep"
+	deep "github.com/NovikovRoman/go-deep"
 	"github.com/stretchr/testify/assert"
 )
 
