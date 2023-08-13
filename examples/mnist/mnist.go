@@ -5,10 +5,8 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
-	"math/rand"
 	"os"
 	"strconv"
-	"time"
 
 	"github.com/NovikovRoman/go-deep/training"
 
@@ -22,8 +20,6 @@ import (
 	https://pjreddie.com/projects/mnist-in-csv/
 */
 func main() {
-	rand.Seed(time.Now().UnixNano())
-
 	train, err := load("./mnist_train.data")
 	if err != nil {
 		panic(err)

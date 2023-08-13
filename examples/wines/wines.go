@@ -5,19 +5,14 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
-	"math/rand"
 	"os"
 	"strconv"
-	"time"
 
 	"github.com/NovikovRoman/go-deep"
 	"github.com/NovikovRoman/go-deep/training"
 )
 
 func main() {
-
-	rand.Seed(time.Now().UnixNano())
-
 	data, err := load("./wine.data")
 	if err != nil {
 		panic(err)
@@ -49,10 +44,11 @@ func main() {
 
 func load(path string) (training.Examples, error) {
 	f, err := os.Open(path)
-	defer f.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer f.Close()
+
 	r := csv.NewReader(bufio.NewReader(f))
 
 	var examples training.Examples
