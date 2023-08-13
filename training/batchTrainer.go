@@ -22,7 +22,7 @@ type internalb struct {
 	deltas            [][][]float64
 	partialDeltas     [][][][]float64
 	accumulatedDeltas [][][]float64
-	moments           [][][]float64
+	// moments           [][][]float64
 }
 
 func newBatchTraining(layers []*deep.Layer, parallelism int) *internalb {
@@ -78,7 +78,7 @@ func (t *BatchTrainer) Train(n *deep.Neural, examples, validation Examples, iter
 		go func(id int, workCh <-chan Example) {
 			n := nets[id]
 			for e := range workCh {
-				n.Forward(e.Input)
+				_ = n.Forward(e.Input)
 				t.calculateDeltas(n, e.Response, id)
 				wg.Done()
 			}

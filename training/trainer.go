@@ -1,6 +1,7 @@
 package training
 
 import (
+	"fmt"
 	"math"
 	"time"
 
@@ -44,7 +45,7 @@ func newTraining(layers []*deep.Layer) *internal {
 }
 
 // Train trains n
-func (t *OnlineTrainer) Train(n *deep.Neural, examples, validation Examples, iterations int) {
+func (t *OnlineTrainer) Train(n *deep.Neural, examples, validation Examples, iterations int) (err error) {
 	t.internal = newTraining(n.Layers)
 
 	//train := make(Examples, len(examples))
@@ -57,18 +58,25 @@ func (t *OnlineTrainer) Train(n *deep.Neural, examples, validation Examples, ite
 	for i := 1; i <= iterations; i++ {
 		examples.Shuffle()
 		for j := 0; j < len(examples); j++ {
-			t.learn(n, examples[j], i)
+			if err = t.learn(n, examples[j], i); err != nil {
+				err = fmt.Errorf("Iteration %d examples %d: %v", i, j, err)
+				return
+			}
 		}
 		if t.verbosity > 0 && i%t.verbosity == 0 && len(validation) > 0 {
 			t.printer.PrintProgress(n, validation, time.Since(ts), i)
 		}
 	}
+	return
 }
 
-func (t *OnlineTrainer) learn(n *deep.Neural, e Example, it int) {
-	n.Forward(e.Input)
+func (t *OnlineTrainer) learn(n *deep.Neural, e Example, it int) (err error) {
+	if err = n.Forward(e.Input); err != nil {
+		return
+	}
 	t.calculateDeltas(n, e.Response)
 	t.update(n, it)
+	return
 }
 
 func (t *OnlineTrainer) calculateDeltas(n *deep.Neural, ideal []float64) {

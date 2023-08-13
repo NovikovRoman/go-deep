@@ -122,15 +122,17 @@ func (n *Neural) Forward(input []float64) error {
 }
 
 // Predict computes a forward pass and returns a prediction
-func (n *Neural) Predict(input []float64) []float64 {
-	n.Forward(input)
+func (n *Neural) Predict(input []float64) (out []float64, err error) {
+	if err = n.Forward(input); err != nil {
+		return
+	}
 
 	outLayer := n.Layers[len(n.Layers)-1]
-	out := make([]float64, len(outLayer.Neurons))
+	out = make([]float64, len(outLayer.Neurons))
 	for i, neuron := range outLayer.Neurons {
 		out[i] = neuron.Value
 	}
-	return out
+	return
 }
 
 // NumWeights returns the number of weights in the network

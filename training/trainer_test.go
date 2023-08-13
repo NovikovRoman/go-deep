@@ -1,7 +1,6 @@
 package training
 
 import (
-	"fmt"
 	"math"
 	"math/rand"
 	"testing"
@@ -11,7 +10,7 @@ import (
 )
 
 func Test_BoundedRegression(t *testing.T) {
-	rand.Seed(0)
+	rand.New(rand.NewSource(0))
 
 	funcs := []func(float64) float64{
 		math.Sin,
@@ -35,17 +34,21 @@ func Test_BoundedRegression(t *testing.T) {
 		})
 
 		trainer := NewTrainer(NewSGD(0.25, 0.5, 0, false), 0)
-		trainer.Train(n, data, nil, 5000)
+		err := trainer.Train(n, data, nil, 5000)
+		assert.Nil(t, err)
 
 		tests := []float64{0.0, 0.1, 0.25, 0.5, 0.75, 0.9}
 		for _, x := range tests {
-			assert.InEpsilon(t, f(x)+1, n.Predict([]float64{x})[0]+1, 0.1)
+			p, err := n.Predict([]float64{x})
+			assert.Nil(t, err)
+			assert.InEpsilon(t, f(x)+1, p[0]+1, 0.1)
 		}
 	}
 }
 
 func Test_RegressionLinearOuts(t *testing.T) {
-	rand.Seed(0)
+	rand.New(rand.NewSource(0))
+
 	squares := Examples{}
 	for i := 0.0; i < 100.0; i++ {
 		squares = append(squares, Example{Input: []float64{i}, Response: []float64{math.Sqrt(i)}})
@@ -65,12 +68,14 @@ func Test_RegressionLinearOuts(t *testing.T) {
 
 	for i := 0; i < 100; i++ {
 		x := float64(rand.Intn(99) + 1)
-		assert.InEpsilon(t, math.Sqrt(x)+1, n.Predict([]float64{x})[0]+1, 0.1)
+		p, err := n.Predict([]float64{x})
+		assert.Nil(t, err)
+		assert.InEpsilon(t, math.Sqrt(x)+1, p[0]+1, 0.1)
 	}
 }
 
 func Test_Training(t *testing.T) {
-	rand.Seed(0)
+	rand.New(rand.NewSource(0))
 
 	data := Examples{
 		Example{[]float64{0}, []float64{0}},
@@ -89,12 +94,15 @@ func Test_Training(t *testing.T) {
 	})
 
 	trainer := NewTrainer(NewSGD(0.5, 0.1, 0, false), 0)
-	trainer.Train(n, data, nil, 1000)
+	err := trainer.Train(n, data, nil, 1000)
+	assert.Nil(t, err)
 
-	v := n.Predict([]float64{0})
-	assert.InEpsilon(t, 1, 1+v[0], 0.1)
-	v = n.Predict([]float64{5})
-	assert.InEpsilon(t, 1.0, v[0], 0.1)
+	p, err := n.Predict([]float64{0})
+	assert.Nil(t, err)
+	assert.InEpsilon(t, 1, 1+p[0], 0.1)
+	p, err = n.Predict([]float64{5})
+	assert.Nil(t, err)
+	assert.InEpsilon(t, 1.0, p[0], 0.1)
 }
 
 var data = []Example{
@@ -111,7 +119,7 @@ var data = []Example{
 }
 
 func Test_Prediction(t *testing.T) {
-	rand.Seed(0)
+	rand.New(rand.NewSource(0))
 
 	n := deep.NewNeural(&deep.Config{
 		Inputs:     2,
@@ -122,10 +130,13 @@ func Test_Prediction(t *testing.T) {
 	})
 	trainer := NewTrainer(NewSGD(0.5, 0.1, 0, false), 0)
 
-	trainer.Train(n, data, nil, 5000)
+	err := trainer.Train(n, data, nil, 5000)
+	assert.Nil(t, err)
 
 	for _, d := range data {
-		assert.InEpsilon(t, n.Predict(d.Input)[0]+1, d.Response[0]+1, 0.1)
+		p, err := n.Predict(d.Input)
+		assert.Nil(t, err)
+		assert.InEpsilon(t, p[0]+1, d.Response[0]+1, 0.1)
 	}
 }
 
@@ -140,10 +151,13 @@ func Test_CrossVal(t *testing.T) {
 	})
 
 	trainer := NewTrainer(NewSGD(0.5, 0.1, 0, false), 0)
-	trainer.Train(n, data, data, 1000)
+	err := trainer.Train(n, data, data, 1000)
+	assert.Nil(t, err)
 
 	for _, d := range data {
-		assert.InEpsilon(t, n.Predict(d.Input)[0]+1, d.Response[0]+1, 0.1)
+		p, err := n.Predict(d.Input)
+		assert.Nil(t, err)
+		assert.InEpsilon(t, p[0]+1, d.Response[0]+1, 0.1)
 		assert.InEpsilon(t, 1, crossValidate(n, data)+1, 0.01)
 	}
 }
@@ -173,23 +187,28 @@ func Test_MultiClass(t *testing.T) {
 	})
 
 	trainer := NewTrainer(NewSGD(0.01, 0.1, 0, false), 0)
-	trainer.Train(n, data, data, 1000)
+	err := trainer.Train(n, data, data, 1000)
+	assert.Nil(t, err)
 
 	for _, d := range data {
-		est := n.Predict(d.Input)
+		est, err := n.Predict(d.Input)
+		assert.Nil(t, err)
 		assert.InEpsilon(t, 1.0, deep.Sum(est), 0.00001)
+
+		p, err := n.Predict(d.Input)
+		assert.Nil(t, err)
 		if d.Response[0] == 1.0 {
-			assert.InEpsilon(t, n.Predict(d.Input)[0]+1, d.Response[0]+1, 0.1)
+			assert.InEpsilon(t, p[0]+1, d.Response[0]+1, 0.1)
 		} else {
-			assert.InEpsilon(t, n.Predict(d.Input)[1]+1, d.Response[1]+1, 0.1)
+			assert.InEpsilon(t, p[1]+1, d.Response[1]+1, 0.1)
 		}
 		assert.InEpsilon(t, 1, crossValidate(n, data)+1, 0.01)
 	}
-
 }
 
 func Test_or(t *testing.T) {
-	rand.Seed(0)
+	rand.New(rand.NewSource(0))
+
 	n := deep.NewNeural(&deep.Config{
 		Inputs:     2,
 		Layout:     []int{1, 1},
@@ -207,15 +226,19 @@ func Test_or(t *testing.T) {
 
 	trainer := NewTrainer(NewSGD(0.5, 0, 0, false), 10)
 
-	trainer.Train(n, permutations, permutations, 25)
+	err := trainer.Train(n, permutations, permutations, 25)
+	assert.Nil(t, err)
 
 	for _, perm := range permutations {
-		assert.Equal(t, deep.Round(n.Predict(perm.Input)[0]), perm.Response[0])
+		p, err := n.Predict(perm.Input)
+		assert.Nil(t, err)
+		assert.Equal(t, deep.Round(p[0]), perm.Response[0])
 	}
 }
 
 func Test_xor(t *testing.T) {
-	rand.Seed(0)
+	rand.New(rand.NewSource(0))
+
 	n := deep.NewNeural(&deep.Config{
 		Inputs:     2,
 		Layout:     []int{3, 1}, // Sufficient for modeling (AND+OR) - with 5-6 neuron always converges
@@ -232,13 +255,12 @@ func Test_xor(t *testing.T) {
 	}
 
 	trainer := NewTrainer(NewSGD(1.0, 0.1, 1e-6, false), 50)
-	trainer.Train(n, permutations, permutations, 500)
+	err := trainer.Train(n, permutations, permutations, 500)
+	assert.Nil(t, err)
 
 	for _, perm := range permutations {
-		assert.InEpsilon(t, n.Predict(perm.Input)[0]+1, perm.Response[0]+1, 0.2)
+		p, err := n.Predict(perm.Input)
+		assert.Nil(t, err)
+		assert.InEpsilon(t, p[0]+1, perm.Response[0]+1, 0.2)
 	}
-}
-
-func printResult(ideal, actual []float64) {
-	fmt.Printf("want: %+v have: %+v\n", ideal, actual)
 }

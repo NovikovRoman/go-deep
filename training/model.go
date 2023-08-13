@@ -1,6 +1,8 @@
 package training
 
-import "math/rand"
+import (
+	"math/rand"
+)
 
 // Example is an input-target pair
 type Example struct {
@@ -33,12 +35,12 @@ func (e Examples) Split(p float64) (first, second Examples) {
 }
 
 // SplitSize splits slice into parts of size size
-func (e Examples) SplitSize(size int) []Examples {
-	res := make([]Examples, 0)
+func (e Examples) SplitSize(size int) (res []Examples) {
+	res = make([]Examples, len(e)/size)
 	for i := 0; i < len(e); i += size {
-		res = append(res, e[i:min(i+size, len(e))])
+		res[i/size] = e[i:min(i+size, len(e))]
 	}
-	return res
+	return
 }
 
 // SplitN splits slice into n parts
@@ -48,11 +50,4 @@ func (e Examples) SplitN(n int) []Examples {
 		res[i%n] = append(res[i%n], el)
 	}
 	return res
-}
-
-func min(a, b int) int {
-	if a <= b {
-		return a
-	}
-	return b
 }

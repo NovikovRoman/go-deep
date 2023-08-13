@@ -1,6 +1,10 @@
 package deep
 
-import "math"
+import (
+	"math"
+
+	"golang.org/x/exp/slices"
+)
 
 // Mean of xx
 func Mean(xx []float64) float64 {
@@ -47,32 +51,10 @@ func Standardize(xx []float64) {
 
 // Normalize scales to (0,1)
 func Normalize(xx []float64) {
-	min, max := Min(xx), Max(xx)
+	min, max := slices.Min(xx), slices.Max(xx)
 	for i, x := range xx {
 		xx[i] = (x - min) / (max - min)
 	}
-}
-
-// Min is the smallest element
-func Min(xx []float64) float64 {
-	min := xx[0]
-	for _, x := range xx {
-		if x < min {
-			min = x
-		}
-	}
-	return min
-}
-
-// Max is the largest element
-func Max(xx []float64) float64 {
-	max := xx[0]
-	for _, x := range xx {
-		if x > max {
-			max = x
-		}
-	}
-	return max
 }
 
 // ArgMax is the index of the largest element
@@ -109,7 +91,7 @@ func Sum(xx []float64) (sum float64) {
 func Softmax(xx []float64) []float64 {
 	out := make([]float64, len(xx))
 	var sum float64
-	max := Max(xx)
+	max := slices.Max(xx)
 	for i, x := range xx {
 		out[i] = math.Exp(x - max)
 		sum += out[i]

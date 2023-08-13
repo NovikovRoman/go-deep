@@ -9,7 +9,8 @@ import (
 )
 
 func Benchmark_xor(b *testing.B) {
-	rand.Seed(0)
+	rand.New(rand.NewSource(0))
+
 	n := deep.NewNeural(&deep.Config{
 		Inputs:     2,
 		Layout:     []int{32, 32, 1},

@@ -80,7 +80,7 @@ optimizer := training.NewSGD(0.05, 0.1, 1e-6, true)
 trainer := training.NewTrainer(optimizer, 50)
 
 training, heldout := data.Split(0.5)
-trainer.Train(n, training, heldout, 1000) // training, validation, iterations
+err := trainer.Train(n, training, heldout, 1000) // training, validation, iterations
 ```
 
 resulting in:
@@ -110,7 +110,7 @@ optimizer := NewAdam(0.001, 0.9, 0.999, 1e-8)
 trainer := training.NewBatchTrainer(optimizer, 1, 200, 4)
 
 training, heldout := data.Split(0.75)
-trainer.Train(n, training, heldout, 1000) // training, validation, iterations
+err := trainer.Train(n, training, heldout, 1000) // training, validation, iterations
 ```
 
 ## Examples

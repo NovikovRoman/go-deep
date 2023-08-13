@@ -49,7 +49,7 @@ func formatAccuracy(n *deep.Neural, validation Examples) string {
 func accuracy(n *deep.Neural, validation Examples) float64 {
 	correct := 0
 	for _, e := range validation {
-		est := n.Predict(e.Input)
+		est, _ := n.Predict(e.Input)
 		if deep.ArgMax(e.Response) == deep.ArgMax(est) {
 			correct++
 		}
@@ -60,7 +60,7 @@ func accuracy(n *deep.Neural, validation Examples) float64 {
 func crossValidate(n *deep.Neural, validation Examples) float64 {
 	predictions, responses := make([][]float64, len(validation)), make([][]float64, len(validation))
 	for i := 0; i < len(validation); i++ {
-		predictions[i] = n.Predict(validation[i].Input)
+		predictions[i], _ = n.Predict(validation[i].Input)
 		responses[i] = validation[i].Response
 	}
 

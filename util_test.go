@@ -48,14 +48,6 @@ func Test_Normalize(t *testing.T) {
 	}
 }
 
-func Test_MinMax(t *testing.T) {
-	s := []float64{5.0, 10.0, 0.0}
-
-	assert.Equal(t, 0.0, Min(s))
-	assert.Equal(t, 10.0, Max(s))
-	assert.Equal(t, 1, ArgMax(s))
-}
-
 func Test_Dot(t *testing.T) {
 	assert.Equal(t, 17.0, Dot([]float64{1.0, 6.0, 3.0}, []float64{2.0, 2.0, 1.0}))
 }

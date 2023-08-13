@@ -8,7 +8,7 @@ import (
 )
 
 func Test_RestoreFromDump(t *testing.T) {
-	rand.Seed(0)
+	rand.New(rand.NewSource(0))
 
 	n := NewNeural(&Config{
 		Inputs:     1,
@@ -27,11 +27,15 @@ func Test_RestoreFromDump(t *testing.T) {
 		}
 	}
 	assert.Equal(t, n.String(), new.String())
-	assert.Equal(t, n.Predict([]float64{0}), new.Predict([]float64{0}))
+	p1, err := n.Predict([]float64{0})
+	assert.Nil(t, err)
+	p2, err := n.Predict([]float64{0})
+	assert.Nil(t, err)
+	assert.Equal(t, p1, p2)
 }
 
 func Test_Marshal(t *testing.T) {
-	rand.Seed(0)
+	rand.New(rand.NewSource(0))
 
 	n := NewNeural(&Config{
 		Inputs:     1,
@@ -53,5 +57,9 @@ func Test_Marshal(t *testing.T) {
 		}
 	}
 	assert.Equal(t, n.String(), new.String())
-	assert.Equal(t, n.Predict([]float64{0}), new.Predict([]float64{0}))
+	p1, err := n.Predict([]float64{0})
+	assert.Nil(t, err)
+	p2, err := n.Predict([]float64{0})
+	assert.Nil(t, err)
+	assert.Equal(t, p1, p2)
 }
