@@ -9,8 +9,13 @@ import (
 
 func Test_SplitSize(t *testing.T) {
 	e := make(Examples, 10)
+	batches := e.SplitSize(15)
+	assert.Len(t, batches, 1)
+	assert.Equal(t, 10, len(batches[0]))
 
-	batches := e.SplitSize(2)
+	e = make(Examples, 10)
+
+	batches = e.SplitSize(2)
 	assert.Len(t, batches, 5)
 	for _, batch := range batches {
 		assert.Equal(t, 2, len(batch))
