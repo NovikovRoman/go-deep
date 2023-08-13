@@ -36,6 +36,9 @@ func (e Examples) Split(p float64) (first, second Examples) {
 
 // SplitSize splits slice into parts of size size
 func (e Examples) SplitSize(size int) (res []Examples) {
+	if len(e) == 0 {
+		return
+	}
 	res = make([]Examples, len(e)/size)
 	for i := 0; i < len(e); i += size {
 		res[i/size] = e[i:min(i+size, len(e))]
