@@ -1,6 +1,7 @@
 package training
 
 import (
+	"math"
 	"math/rand"
 )
 
@@ -36,10 +37,12 @@ func (e Examples) Split(p float64) (first, second Examples) {
 
 // SplitSize splits slice into parts of size size
 func (e Examples) SplitSize(size int) (res []Examples) {
-	s := len(e) / size
+	//s := len(e) / size
+	s := int(math.Ceil(float64(len(e)) / float64(size)))
 	if s == 0 {
 		s++
 	}
+
 	res = make([]Examples, s)
 	for i := 0; i < len(e); i += size {
 		res[i/size] = e[i:min(i+size, len(e))]
